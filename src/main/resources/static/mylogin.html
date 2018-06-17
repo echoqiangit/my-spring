@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet"
+	href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+<title>Insert title here</title>
+<body onLoad="resetAll( )">
+	<h1>REST App Project</h1>
+	<hr>
+	<div id="logintab">
+		username: <input type="text" id="input_username"
+			placeholder="Required" /><br /> password: <input type="text"
+			id="input_password" /><br /> <br />
+		<button id="login">Log in</button>
+		&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+		<button id="reset">Reset</button>
+		<br /> <br />
+	</div>
+
+	<script type="text/javascript">
+		var uriLogin = 'http://localhost:5000/ihub/v1/login';
+		var authId;
+		var username;
+		var password;
+		var loginacc = {
+			'username' : '',
+			'password' : ''
+		};
+
+		// Reset all page data
+		$('#reset').click(function() {
+			resetAll()
+		});
+
+		// handle username field change
+		$('#input_username').keyup(function() {
+			username = $(this).val();
+		});
+
+		// handle password field change
+		$('#input_password').keyup(function() {
+			password = $(this).val();
+		});
+
+		// process login button
+		$('#login').click(
+				function() {
+					if (password) {
+						loginacc = {
+							'username' : username,
+							'password' : password
+						}
+					} else {
+						loginacc = {
+							'username' : username,
+							'password' : ''
+						}
+					}
+					;
+					$.ajax({
+						type : 'POST',
+						data : JSON.stringify(loginacc),
+						url : uriLogin,
+						contentType : 'application/json; charset=utf-8',
+						dataType : 'json',
+						success : function(data) {
+							console.log(JSON.stringify(data));
+
+							authId = data.AuthId;
+							$('#output').html(
+									"Login success<br/>User : "
+											+ data.User.Name + "<br/>authId: "
+											+ data.AuthId);
+						},
+						error : function(data) {
+							console.log(data);
+							
+							$('#output').html(
+									"Login failure <br/>User : " + username);
+							$('input:text').val("");
+						}
+					});
+					console.log('after');
+
+				});
+
+		function resetAll() {
+			$('input:text').val("");
+			$('#output').empty();
+		}
+	</script>
+	<div id="output"></div>
+</body>
+</html>
